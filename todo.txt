@@ -1,1 +1,3 @@
 add link for hardware copy to local and gitingore?
+
+add instructions for new system or just already in one with the scripts and installing home manager
