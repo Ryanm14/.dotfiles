@@ -1,7 +1,6 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
@@ -10,28 +9,12 @@
       ./hardware-configuration.nix
     ];
 
-  # Use the GRUB 2 boot loader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
-  # boot.loader.grub.efiSupport = true;
-  # boot.loader.grub.efiInstallAsRemovable = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  boot = {
-    # Ensure the exfat file type is supported when loading USB devices
-    supportedFilesystems = [ "exfat" ];
-  };
-
-  networking = {
-    hostName = "nixos";
-    wireless.enable = true; # Enables wireless support via wpa_supplicant.
-    # Enables wireless support via networkmanager
-    networkmanager = {
-      enable = true;
-    };
-  };
+  networking.hostName = "nixos"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Set your time zone.
   time.timeZone = "America/New_York";
@@ -40,7 +23,8 @@
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
   networking.useDHCP = false;
-  networking.interfaces.ens3.useDHCP = true;
+  networking.interfaces.eno1.useDHCP = true;
+  networking.interfaces.wlp1s0.useDHCP = true;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -58,8 +42,8 @@
 
 
   # Enable the GNOME 3 Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome3.enable = true;
+  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.desktopManager.xfce.enable = true;
   
 
   # Configure keymap in X11
@@ -71,39 +55,27 @@
 
   # Enable sound.
   sound.enable = true;
-  hardware = {
-    pulseaudio = {
-      enable = true;
-      package = pkgs.pulseaudioFull;
-    };
-
-    bluetooth.enable = true;
-  };
-
+  hardware.pulseaudio.enable = true;
+  hardware.bluetooth.enable = true;
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput.enable = true;
-
+  nixpkgs.config.allowUnfree = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.ryan = {
-    isNormalUser = true;
+    initialPassword = "ryan";
     createHome = true;
-    initialPassword="ryan";
-    extraGroups = [ "wheel" "adbusers" "networkmanager" "video"]; # Enable ‘sudo’ for the user.
-    uid = 1000;
+    isNormalUser = true;
+    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   };
-
-  nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim light networkmanagerapplet
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    wget git cifs-utils
+    firefox
   ];
 
-  # Wrapper for backlight. Must enable hardware.brightness.ctl and add
-  # user to the "video" group as well.
-  programs.light.enable = true;
- 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -112,125 +84,12 @@
   #   enableSSHSupport = true;
   # };
 
-  services.xserver.displayManager.sessionCommands = ''
-    ${lib.getBin pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
-  '';
-
-  services = {
-    openssh.enable = true;
-    logind.extraConfig = "HandleLidSwitch=ignore";
-
-    # automatically change xrandr profiles on display change
-    autorandr.enable = true;
-
-    # bluetooth control
-    blueman.enable = true;
-
-    # monitor and manage CPU temp, throttling as needed
-    thermald.enable = true;
-
-    # monitor and control Macbook Pro fans
-    # mbpfan = {
-    #   # see mbpfan.nix file in nixpkgs for extra config options
-    #   enable = true;
-    # };
-
-    # Enable dbus + dconf to manage system dialogs
-    dbus = {
-      packages = with pkgs; [ gnome3.dconf ];
-    };
-
-    # Remap what happens on power key press so it suspends rather than
-    # shutting don immediately
-    # logind = {
-    #   extraConfig = ''
-    #     HandlePowerKey=suspend
-    #   '';
-    # };
-
-    # Enable printing with Brother drivers
-    printing = {
-      enable = true;
-      drivers = with pkgs; [ gutenprint gutenprintBin brlaser ];
-    };
-
-    # postgresql = {
-    #   enable = true;
-    #   package = pkgs.postgresql_11;
-    #   enableTCPIP = true;
-
-    #   authentication = ''
-    #     local all all trust
-    #     host all all 0.0.0.0/0 trust
-    #   '';
-    # };
-
-    # Enable the X11 windowing system
-    xserver = {
-      enable = true;
-      autorun = true;
-      dpi = 192;
-
-      # support external monitors via DisplayPort in addition to the
-      # default screen eDP (use `xrandr` to list)
-      xrandrHeads = [ "eDP" "DisplayPort-0" ];
-
-      # desktopManager = {
-      #   xterm.enable = false;
-      # };
-
-      # displayManager.defaultSession = "none+i3";
-
-      # displayManager.lightdm = {
-      #   enable = true;
-      #   autoLogin.enable = true;
-      #   autoLogin.user = "trh";
-      # };
-
-      # windowManager = {
-      #   i3.enable = true;
-      # };
-
-      # Enable touchpad support
-      libinput = {
-        enable = true;
-        naturalScrolling = true;
-      };
-    };
-  };
-
-  fonts = {
-    enableFontDir = true;
-    enableGhostscriptFonts = true;
-
-    fontconfig = {
-      enable = true;
-      antialias = true;
-      useEmbeddedBitmaps = true;
-
-      defaultFonts = {
-        serif = [ "Source Serif Pro" "DejaVu Serif" ];
-        sansSerif = [ "Source Sans Pro" "DejaVu Sans" ];
-        monospace = [ "Fira Code" "Hasklig" ];
-      };
-    };
-
-    fonts = with pkgs; [
-      hasklig
-      source-code-pro
-      overpass
-      nerdfonts
-      fira
-      fira-code
-      fira-mono
-    ];
-  };
-
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
-
+  services.logind.extraConfig = "HandleLidSwitch=ignore";
+  services.blueman.enable = true;
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
@@ -243,7 +102,7 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "20.09"; # Did you read the comment?
+  system.stateVersion = "21.05"; # Did you read the comment?
 
 }
 

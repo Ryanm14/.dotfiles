@@ -1,0 +1,1 @@
+add link for hardware copy to local and gitingore?

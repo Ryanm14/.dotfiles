@@ -9,11 +9,12 @@ in
 {
    # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
-
+  home.username = "ryan";
+  home.homeDirectory = "/home/ryan";
   home.packages = with pkgs; [
     #Browser
     brave firefox google-chrome
-    
+       
     #Editor
     vscode texstudio
 
@@ -352,4 +353,5 @@ in
   #     PATH=$PATH:${pkgs.i3}/bin polybar top &
   #   '';
   # };
+  home.stateVersion = "21.05";
 }
