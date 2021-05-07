@@ -95,7 +95,34 @@
   # services.openssh.enable = true;
   services.logind.extraConfig = "HandleLidSwitch=ignore";
   services.blueman.enable = true;
-  # Open ports in the firewall.
+  fonts = {
+    enableFontDir = true;
+    enableGhostscriptFonts = true;
+
+    fontconfig = {
+      enable = true;
+      antialias = true;
+      useEmbeddedBitmaps = true;
+
+      defaultFonts = {
+        serif = [ "Source Serif Pro" "DejaVu Serif" ];
+        sansSerif = [ "Source Sans Pro" "DejaVu Sans" ];
+        monospace = [ "Fira Code" "Hasklig" ];
+      };
+    };
+
+    fonts = with pkgs; [
+      hasklig
+      source-code-pro
+      overpass
+      nerdfonts
+      fira
+      fira-code
+      fira-mono
+    ];
+  };
+
+ # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
