@@ -29,6 +29,9 @@ in
 
     teamviewer discord mpv
 
+    nix-prefetch-scripts
+    lazygit
+
     # command line
     htop ranger zathura xclip tree
 
@@ -63,6 +66,7 @@ in
 
   programs.bat = {
     enable = true;
+    config.style = "numbers,changes,header";
   };
 
   programs.lsd = {
@@ -103,6 +107,98 @@ in
   programs.ssh = {
     enable = true;
   };
+
+  programs.fish = {
+     enable = true;
+     shellAliases = {
+        ".." = "cd ..";
+        cat = "bat";
+        untar = "tar -xvzf";
+        lg = "lazygit";
+        nixos-re = "nixos-rebuild switch";
+        home-re = "home-manager switch";
+        nixtrash = "nix-collect-garbage";
+        nixtrash-all = "nix-collect-garbage -d ";
+     };
+
+     plugins = [
+           {
+             name = "z";
+             src = pkgs.fetchFromGitHub {
+               owner = "jethrokuan";
+               repo = "z";
+               rev = "ddeb28a7b6a1f0ec6dae40c636e5ca4908ad160a";
+               sha256 = "0c5i7sdrsp0q3vbziqzdyqn4fmp235ax4mn4zslrswvn8g3fvdyh";
+             };
+           }
+           {
+             name = "fish-ssh-agent";
+             src = pkgs.fetchFromGitHub {
+               owner = "danhper";
+               repo = "fish-ssh-agent";
+               rev = "ce90d80aa9549c626f9c5fc5a964536de015a192";
+               sha256 = "03zj5g7dxkhqpp9lijxxlnyx4cc7nqpapj5iqfv7swavyximicyi";
+             };
+           }
+     ];
+
+     interactiveShellInit = ''
+         set fish_greeting
+         set -U fish_escape_delay_ms 10
+     '';
+
+      loginShellInit = ''
+            direnv hook fish | source
+          '';
+  };
+
+  programs.starship.enable = true;
+  programs.starship.enableFishIntegration = true;
+  programs.starship.settings.add_newline = true;
+#  programs.starship.settings.battery = {
+#    full_symbol = "[➜](#c792ea)";
+#    charging_symbol = "[ ](bold green)";
+#    discharging_symbol = "[➜](bold red)";
+#    display = {
+#        threshold = 100;
+#        style = "bold red";
+#     };
+#  };
+
+  programs.starship.settings.directory = {
+    style = "bold cyan";
+  };
+
+  programs.starship.settings.nix_shell = {
+    disabled = false;
+    symbol = " ";
+  };
+
+   programs.starship.settings.rust = {
+      disabled = false;
+      format = "via [⚙️$version](red bold)";
+#      detect_files =
+    };
+
+  programs.alacritty = {
+      enable = true;
+      settings = {
+      	font = {
+            size = 12;
+            use_thin_strokes = true;
+
+            normal.family = "FuraCode Nerd Font";
+            bold.family = "FuraCode Nerd Font";
+            italic.family = "FuraCode Nerd Font";
+          };
+
+          env = {
+              "TERM" = "xterm-256color";
+            };
+
+      };
+
+    };
 
   # https://github.com/target/lorri
   services.lorri.enable = true;

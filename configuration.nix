@@ -69,6 +69,7 @@
   users.users.ryan = {
     initialPassword = "ryan";
     createHome = true;
+    shell = pkgs.fish;
     isNormalUser = true;
     extraGroups = [ "wheel" "adbusers"]; # Enable ‘sudo’ for the user.
   };
