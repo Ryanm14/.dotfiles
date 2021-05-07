@@ -31,6 +31,7 @@ in
 
     nix-prefetch-scripts
     lazygit
+    tldr
 
     # command line
     htop ranger zathura xclip tree
@@ -119,6 +120,23 @@ in
         home-re = "home-manager switch";
         nixtrash = "nix-collect-garbage";
         nixtrash-all = "nix-collect-garbage -d ";
+        c = "clear";
+     };
+
+     functions = {
+        mcd =  ''
+            mkdir -p $argv
+            cd $argv
+            '';
+
+        cls =  ''
+            cd $argv
+            ls
+            '';
+
+        backup =  ''
+            cp $argv $argv.bak
+            '';
      };
 
      plugins = [
