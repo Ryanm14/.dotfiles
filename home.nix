@@ -22,7 +22,7 @@ in
     direnv
 
     # desktop
-    albert insync tilda etcher
+    albert tilda etcher
 
     #Work
     slack teams spotify todoist-electron zoom-us 
