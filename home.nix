@@ -32,6 +32,7 @@ in
     nix-prefetch-scripts
     lazygit
     tldr
+    sysfsutils
 
     # command line
     htop ranger zathura xclip tree
@@ -116,10 +117,12 @@ in
         cat = "bat";
         untar = "tar -xvzf";
         lg = "lazygit";
-        nixos-re = "nixos-rebuild switch";
+        nixos-re = "sudo nixos-rebuild switch";
         home-re = "home-manager switch";
-        nixtrash = "nix-collect-garbage";
-        nixtrash-all = "nix-collect-garbage -d ";
+        nixtrash = "sudo nix-collect-garbage";
+        nixtrash-all = "sudo nix-collect-garbage -d";
+        nixtrash-old = "sudo nix-collect-garbage --delete-older-than 30d";
+        nix-optimize = "sudo nix-store --optimise -v";
         c = "clear";
      };
 

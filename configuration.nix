@@ -44,7 +44,29 @@
   # Enable the GNOME 3 Desktop Environment.
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
+  #services.xserver.displayManager.defaultSession = "none+qtile";
+  #services.xserver.windowManager = {
+   # qtile.enable = true;
+  #};
   
+  nixpkgs.overlays = [
+      (self: super: { qtile = super.qtile.overrideAttrs(oldAttrs: {
+    pythonPath = oldAttrs.pythonPath ++ (with self.python37Packages;[ 
+	keyring
+	xcffib
+	setuptools
+	setuptools_scm
+	dateutil
+	dbus-python
+	mpd2
+	psutil
+	pyxdg
+	pygobject3
+	  ]);
+	});
+    })
+];
+
 
   # Configure keymap in X11
   # services.xserver.layout = "us";
@@ -60,10 +82,14 @@
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput.enable = true;
   nixpkgs.config.allowUnfree = true;
-
+  services.xserver.videoDrivers = ["displaylink"];
   programs.adb.enable = true;
   boot.kernelModules = ["kvm-amd"];
   virtualisation.libvirtd.enable = true;
+   
+  services.xserver.displayManager.sessionCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --setprovideroutputsource 2 0
+'';
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.ryan = {
